@@ -18,4 +18,5 @@ public class ClientService {
     public List<Client> findAllClients() {
         return clientRepository.findAll();
     }
+
 }
