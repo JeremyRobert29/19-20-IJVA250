@@ -106,32 +106,23 @@ public class ExportController {
         response.setContentType("text/xlsx");
         response.setHeader("Content-Disposition", "attachment; filename=\"factures.xlsx\"");
 
-        List<Facture> factures = factureService.findFacturesClient(clientId);
+
         List<Client> clients = clientService.findAllClients();
-
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet1 = workbook.createSheet("clients");
-        Sheet sheet = workbook.createSheet("factures");
-
-        Row headerRow1 = sheet1.createRow(0);
-        Cell cellId1 = headerRow1.createCell(0);
-        cellId1.setCellValue("Id");
-        Cell cellNom = headerRow1.createCell(1);
-        cellNom.setCellValue("Nom");
-        Cell cellPrenom = headerRow1.createCell(2);
-        cellPrenom.setCellValue("Prenom");
-
-
-        Row headerRow = sheet.createRow(0);
-        Cell cellId = headerRow.createCell(0);
-        cellId.setCellValue("Id");
-        Cell cellTotal = headerRow.createCell(1);
-        cellTotal.setCellValue("Total");
-
 
         int iRow1 = 1;
-        for (Client client : clients) {
-            Row row1 = sheet1.createRow(iRow1);
+        for (Client client : clients ) {
+            Sheet sheetClient = workbook.createSheet(client.getNom());
+
+            Row headerRow1 = sheetClient.createRow(0);
+            Cell cellId1 = headerRow1.createCell(0);
+            cellId1.setCellValue("Id");
+            Cell cellNom = headerRow1.createCell(1);
+            cellNom.setCellValue("Nom");
+            Cell cellPrenom = headerRow1.createCell(2);
+            cellPrenom.setCellValue("Prenom");
+
+            Row row1 = sheetClient.createRow(iRow1);
 
             Cell id1 = row1.createCell(0);
             id1.setCellValue(client.getId());
@@ -142,62 +133,30 @@ public class ExportController {
             Cell prenom = row1.createCell(2);
             prenom.setCellValue(client.getPrenom());
 
-            iRow1 = iRow1 + 1;
-        }
-        int iRow = 1;
-        for (Facture facture : factures) {
-            Row row = sheet.createRow(iRow);
+            List<Facture> factures = factureService.findFacturesClient(client.getId());
+            int iRow = 1;
+            for (Facture facture : factures) {
+                Sheet sheetFact = workbook.createSheet("Facture" + facture.getId());
 
-            Cell id = row.createCell(0);
-            id.setCellValue(facture.getId());
+                Row headerRow = sheetFact.createRow(0);
+                Cell cellId = headerRow.createCell(0);
+                cellId.setCellValue("Id");
+                Cell cellTotal = headerRow.createCell(1);
+                cellTotal.setCellValue("Total");
 
-            Cell Total = row.createCell(1);
-            Total.setCellValue(facture.getTotal());
+                Row row = sheetFact.createRow(iRow);
 
-            iRow = iRow + 1;
+                Cell id = row.createCell(0);
+                id.setCellValue(facture.getId());
+
+                Cell Total = row.createCell(1);
+                Total.setCellValue(facture.getTotal());
+
+            }
         }
         workbook.write(response.getOutputStream());
         workbook.close();
 
     }
 
-    /*@Autowired
-    private FactureService factureService;
-
-    @GetMapping("/factures/xlsx")
-    public void FactureXLSX(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/xlsx");
-        response.setHeader("Content-Disposition", "attachment; filename=\"factures.xlsx\"");
-
-        List<Facture> allFactures = factureService.findAllFactures();
-        LocalDate now = LocalDate.now();
-
-
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("factures");
-        Row headerRow = sheet.createRow(0);
-
-        Cell cellId = headerRow.createCell(0);
-        cellId.setCellValue("Id");
-
-        Cell cellClient = headerRow.createCell(1);
-        cellClient.setCellValue("Client");
-
-        Cell cellLigneFacture = headerRow.createCell(2);
-        cellLigneFacture.setCellValue("LigneFacture");
-
-        int iRow = 1;
-        for (Facture facture : allFactures) {
-            Row row = sheet.createRow(iRow);
-
-            Cell id = row.createCell(0);
-            id.setCellValue(facture.getId());
-
-
-
-            iRow = iRow + 1;
-        }
-        workbook.write(response.getOutputStream());
-        workbook.close();
-    }*/
 }
