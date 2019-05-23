@@ -143,6 +143,7 @@ public class ExportController {
                 cellId.setCellValue("Id");
                 Cell cellTotal = headerRow.createCell(1);
                 cellTotal.setCellValue("Total");
+
                 Row row = sheetFact.createRow(iRow);
 
                 Cell id = row.createCell(0);
